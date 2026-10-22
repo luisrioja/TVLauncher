@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Inicio</string>
+    <string name="inputs">Entradas</string>
+    <string name="apps">Apps</string>
+    <string name="settings">Ajustes</string>
+    <string name="android_settings">Ajustes de Android</string>
+    <string name="show_hidden">Mostrar apps ocultas (%d)</string>
+    <string name="on_start">al encender</string>
+    <string name="set_start">Usar al encender</string>
+    <string name="unset_start">No usar al encender</string>
+    <string name="move_left">Mover a la izquierda</string>
+    <string name="move_right">Mover a la derecha</string>
+    <string name="hide">Ocultar</string>
+    <string name="input_failed">No se pudo abrir la entrada</string>
+    <string name="app_failed">No se pudo abrir la app</string>
+    <string name="key_service_description">Hace que los botones de inicio del mando abran siempre esta pantalla.</string>
+</resources>
