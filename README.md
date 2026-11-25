@@ -79,9 +79,11 @@ adb shell settings put secure accessibility_enabled 1
 
 ```bash
 for p in com.google.android.tvlauncher \
+         com.xiaomi.mitv.updateservice \
          com.mitv.tvhome.atv com.mitv.tvhome.mitvplus com.mitv.tvhome.michannel \
          com.google.android.tvrecommendations \
-         com.miui.tv.analytics com.xiaomi.statistic \
+         com.miui.tv.analytics com.xiaomi.statistic com.xiaomi.tvqs.overseas \
+         com.xm.webcontent android.autoinstalls.config.xiaomi.amelie \
          com.xiaomi.amazon.alexa com.xiaomi.mitv.tvmanager com.mitv.gallery \
          com.xiaomi.mitv.mediaexplorer com.google.android.videos com.google.android.play.games; do
   adb shell pm disable-user --user 0 $p
@@ -93,6 +95,38 @@ adb shell input keyevent KEYCODE_HOME
 If you have another launcher or a key remapper installed (Projectivy, Button
 Mapper…), disable it too. Its accessibility service will fight this one for the
 home button.
+
+## Keeping PatchWall away
+
+- **Disable Xiaomi's updater (`com.xiaomi.mitv.updateservice`).** It is in the
+  list above for a reason. Installing an update on top of a disabled package
+  enables it again. On the test TV, PatchWall came back two weeks after it had
+  been disabled: the updater installed a new version of it. PatchWall then
+  updated Mi TV+ and the updater itself, so they came back too. PatchWall
+  doesn't need to be the HOME app to show up: the firmware opens it at boot.
+  The catch is that firmware updates stop arriving as well.
+- **Stop the ADB authorization from expiring.** Android 11 revokes it after 7
+  days without a connection, even if you ticked "Always allow". The TV then
+  shows up as `unauthorized` and you have to accept the prompt on screen again.
+  To turn that off:
+
+  ```bash
+  adb shell settings put global adb_allowed_connection_time 0
+  ```
+
+- **Don't reboot with `adb reboot` right after disabling packages.** Android
+  writes the change to disk about 10 seconds later. On the test TV, a reboot
+  straight away lost it and every package came back. Wait half a minute, then
+  use `adb shell svc power reboot`, which shuts down cleanly.
+- **If PatchWall shows up again**, find out what updated it:
+
+  ```bash
+  adb shell pm list packages -d
+  adb shell dumpsys package com.mitv.tvhome.atv | grep -E "lastUpdateTime|installerPackageName|enabled="
+  ```
+
+  `pm list packages -d` leaves out hidden packages, even when they're
+  disabled. Use `dumpsys package <name>` to check one of those.
 
 ## Do not disable
 
@@ -128,6 +162,8 @@ home button.
 
 ```bash
 adb shell pm enable com.google.android.tvlauncher   # and the rest of the list above
+adb shell pm enable com.xiaomi.mitv.updateservice   # firmware and app updates again
+adb shell settings delete global adb_allowed_connection_time
 adb shell settings put secure enabled_accessibility_services '""'
 adb uninstall luisrioja.tvlauncher
 ```
